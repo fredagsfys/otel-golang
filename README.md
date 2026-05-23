@@ -46,9 +46,9 @@ curl "http://localhost:8080/health"
 
 Open Grafana at <http://localhost:3000> (login `admin` / `admin`) → **Explore**:
 
-- **Traces** — datasource `Tempo`, run TraceQL `{ resource.service.name = "greeter-service" }`
+- **Traces** — datasource `Tempo`, run TraceQL `{ resource.service.name = "greeter-service-golang" }`
 - **Metrics** — datasource `Prometheus`, search for `http_server_request_duration_seconds_count`
-- **Logs** — datasource `Loki`, query `{service_name="greeter-service"}`
+- **Logs** — datasource `Loki`, query `{service_name="greeter-service-golang"}`
 
 Other endpoints: Prometheus <http://localhost:9090>, Tempo API <http://localhost:3200>,
 collector health <http://localhost:13133>. To watch what the collector receives:

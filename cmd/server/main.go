@@ -20,7 +20,7 @@ import (
 )
 
 const (
-	serviceName    = "greeter-service"
+	serviceName    = "greeter-service-golang"
 	serviceVersion = "1.0.0"
 	addr           = ":8080"
 )
