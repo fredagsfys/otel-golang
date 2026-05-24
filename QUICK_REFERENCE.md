@@ -104,6 +104,7 @@ OTEL_EXPORTER_OTLP_HEADERS=api-key=YOUR_KEY         # hosted backend auth
 OTEL_TRACES_SAMPLER=parentbased_traceidratio        # sampling strategy
 OTEL_TRACES_SAMPLER_ARG=0.1                          # ...sample 10% of traces
 OTEL_METRICS_EXPORTER=none                           # disable a signal entirely
+OTEL_METRIC_EXPORT_INTERVAL=60000                    # metric export interval (ms); default 60000
 OTEL_RESOURCE_ATTRIBUTES=team=payments               # extra resource attributes
 ```
 

@@ -135,6 +135,7 @@ so the same binary is configured purely through its environment:
 | `OTEL_EXPORTER_OTLP_HEADERS` | Auth headers for hosted backends | _(none)_ |
 | `OTEL_TRACES_SAMPLER` / `_ARG` | Sampling strategy / ratio | `parentbased_always_on` |
 | `OTEL_{TRACES,METRICS,LOGS}_EXPORTER` | Set to `none` to disable a signal | `otlp` |
+| `OTEL_METRIC_EXPORT_INTERVAL` | Metric export interval (ms) | `60000` |
 | `OTEL_RESOURCE_ATTRIBUTES` / `OTEL_SERVICE_NAME` | Extra resource attributes | _(none)_ |
 
 > **Talking to the local (plaintext) collector:** OTLP exporters default to a
