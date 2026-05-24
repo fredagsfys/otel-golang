@@ -43,7 +43,8 @@ type Config struct {
 //	OTEL_EXPORTER_OTLP_HEADERS    auth headers for hosted backends, e.g. "api-key=..."
 //	OTEL_TRACES_SAMPLER[_ARG]     sampling strategy (default parentbased_always_on)
 //	OTEL_{TRACES,METRICS,LOGS}_EXPORTER  set to "none" to disable a signal
-//	OTEL_RESOURCE_ATTRIBUTES      extra resource attributes, e.g. "team=payments"
+//	OTEL_SERVICE_NAME             overrides cfg.ServiceName
+//	OTEL_RESOURCE_ATTRIBUTES      extra/override resource attributes, e.g. "team=payments"
 func Setup(ctx context.Context, cfg Config) (shutdown func(context.Context) error, err error) {
 	// Surface SDK-internal errors (export failures, etc.) instead of swallowing them.
 	otel.SetErrorHandler(otel.ErrorHandlerFunc(func(err error) {
@@ -56,14 +57,7 @@ func Setup(ctx context.Context, cfg Config) (shutdown func(context.Context) erro
 		propagation.Baggage{},
 	))
 
-	res, err := resource.New(ctx,
-		resource.WithFromEnv(), // OTEL_SERVICE_NAME, OTEL_RESOURCE_ATTRIBUTES
-		resource.WithAttributes(
-			semconv.ServiceName(cfg.ServiceName),
-			semconv.ServiceVersion(cfg.ServiceVersion),
-			semconv.DeploymentEnvironmentName(cfg.Environment),
-		),
-	)
+	res, err := newResource(ctx, cfg)
 	if err != nil {
 		return nil, fmt.Errorf("telemetry: build resource: %w", err)
 	}
@@ -120,4 +114,24 @@ func Setup(ctx context.Context, cfg Config) (shutdown func(context.Context) erro
 	global.SetLoggerProvider(lp)
 
 	return shutdown, nil
+}
+
+// newResource builds the resource describing this service. The cfg fields act as
+// defaults that the standard OTEL_SERVICE_NAME / OTEL_RESOURCE_ATTRIBUTES env
+// vars may override.
+//
+// Order matters: resource Merge is last-value-wins, so WithFromEnv() is applied
+// AFTER WithAttributes() to let env vars override the code defaults (idiomatic
+// OTel precedence: code = defaults, env = override). When OTEL_SERVICE_NAME /
+// OTEL_RESOURCE_ATTRIBUTES are unset, the env detector contributes nothing for
+// those keys, so the cfg defaults still hold.
+func newResource(ctx context.Context, cfg Config) (*resource.Resource, error) {
+	return resource.New(ctx,
+		resource.WithAttributes(
+			semconv.ServiceName(cfg.ServiceName),
+			semconv.ServiceVersion(cfg.ServiceVersion),
+			semconv.DeploymentEnvironmentName(cfg.Environment),
+		),
+		resource.WithFromEnv(), // OTEL_SERVICE_NAME, OTEL_RESOURCE_ATTRIBUTES override the above
+	)
 }
