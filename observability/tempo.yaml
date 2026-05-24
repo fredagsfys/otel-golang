@@ -1,6 +1,13 @@
 server:
   http_listen_port: 3200
 
+# Allow TraceQL metrics queries (the rate()/histogram panel Grafana draws above
+# trace results) over long time ranges. The default cap is 3h, which makes
+# selecting 12h+ in Grafana's Tempo Explore fail with a 400.
+query_frontend:
+  metrics:
+    max_duration: 168h
+
 distributor:
   receivers:
     otlp:
